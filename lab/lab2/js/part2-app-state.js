@@ -30,10 +30,23 @@
        var one = justOne();
 ===================== */
 
-var downloadData = $.ajax("");
-var parseData = function() {};
-var makeMarkers = function() {};
-var plotMarkers = function() {};
+var parseData = function(data){
+  return JSON.parse(data);
+  };
+
+var makeMarkers = function(data){
+  return _.map(data, function(num){
+    return L.marker([num.Y, num.X]);
+  });
+};
+
+var plotMarkers = function(data) {
+  return _.each(data, function(num){
+    num.addTo(map);
+  });
+};
+
+var downloadData = $.ajax("https://raw.githubusercontent.com/CPLN690-MUSA610/datasets/master/json/philadelphia-solar-installations.json");
 
 
 /* =====================
@@ -49,7 +62,11 @@ var plotMarkers = function() {};
   user's input.
 ===================== */
 
-var removeMarkers = function() {};
+var removeMarkers = function(data) {
+   return _.each(data, function(num){
+     map.removeLayer(num);
+  });
+};
 
 /* =====================
   Optional, stretch goal
@@ -61,13 +78,20 @@ var removeMarkers = function() {};
 /* =====================
  CODE EXECUTED DOWN HERE!
 ===================== */
+filteredData = function(data){
+  return _.filter(data, function(num){
+    return num.KW >= 5 ;
+  });
+};
 
 downloadData.done(function(data) {
   var parsed = parseData(data);
-  var markers = makeMarkers(parsed);
+  var filter = filteredData(parsed);
+  var markers = makeMarkers(filter);
   plotMarkers(markers);
   removeMarkers(markers);
 });
+
 
 /* =====================
  Leaflet setup
